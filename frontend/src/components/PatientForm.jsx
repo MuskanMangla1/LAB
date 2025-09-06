@@ -33,7 +33,7 @@ function PatientForm({ onAdded }) {
     e.preventDefault();
     setError("");
     try {
-      await axios.post("http://localhost:5000/api/patients", form);
+      await axios.post("https://lab-c7sj.onrender.com/api/patients", form);
       alert("✅ Patient Added!");
       setForm({
         name: "",

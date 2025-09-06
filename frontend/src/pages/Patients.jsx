@@ -8,7 +8,7 @@ function PatientsPage({ showListOnly = false, showFormOnly = false }) {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients"  );
+      const res = await axios.get("https://lab-c7sj.onrender.com/api/patients"  );
       setPatients(res.data);
     } catch (err) {
       console.error(err);

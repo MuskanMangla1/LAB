@@ -11,7 +11,7 @@ function Reports() {
   
   const fetchDaily = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients/daily");
+      const res = await axios.get("https://lab-c7sj.onrender.com/api/patients/daily");
       setDaily(res.data);
     } catch (err) {
       console.error(err);
@@ -19,7 +19,7 @@ function Reports() {
   };
   const fetchMonthly = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients/monthly");
+      const res = await axios.get("https://lab-c7sj.onrender.com/api/patients/monthly");
       setMonthly(res.data);
     } catch (err) {
       console.error(err);
@@ -30,7 +30,7 @@ function Reports() {
     if (!start || !end) return alert("Select start and end dates");
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/patients/range?start=${start}&end=${end}`
+        `https://lab-c7sj.onrender.com/api/patients/range?start=${start}&end=${end}`
       );
       setRange(res.data);
     } catch (err) {
