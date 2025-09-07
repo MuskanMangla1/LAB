@@ -6,7 +6,12 @@ import cors from "cors";
 import patientRoutes from "./routes/patient.route.js";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],    
+  credentials: true
+}));
+
 app.use(express.json());
 
 // routes
