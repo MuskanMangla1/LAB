@@ -92,6 +92,33 @@ router.get("/daily", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const patient = await Patient.findByIdAndDelete(id);
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+    res.json({ message: "Patient deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update patient by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const patient = await Patient.findByIdAndUpdate(id, updates, { new: true });
+    if (!patient) return res.status(404).json({ error: "Patient not found" });
+
+    res.json(patient);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Monthly report (current calendar month)
 router.get("/monthly", async (req, res) => {
