@@ -7,10 +7,11 @@ import patientRoutes from "./routes/patient.route.js";
 
 const app = express();
 app.use(cors({
-  origin: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],    
+  origin: ["http://localhost:5173", "https://lab-seven-beta.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
 
 app.use(express.json());
 
@@ -25,3 +26,4 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch(err => console.error("Mongo connection error:", err));
+
