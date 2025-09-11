@@ -17,7 +17,7 @@ function PatientList({ onUpdated }) {
   const fetchPatients = async (date) => {
     try {
       const res = await axios.get(
-        `https://my-patient-backend.onrender.com/api/patients/range?start=${date}&end=${date}`
+        `https://lab-c7sj.onrender.com/api/patients/range?start=${date}&end=${date}`
       );
       setPatients(res.data.patients);
     } catch (err) {
@@ -28,7 +28,7 @@ function PatientList({ onUpdated }) {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this patient?")) return;
     try {
-      await axios.delete(`https://my-patient-backend.onrender.com/api/patients/${id}`);
+      await axios.delete(`https://lab-c7sj.onrender.com/api/patients/${id}`);
       alert("❌ Patient Deleted");
       fetchPatients(selectedDate);
       if (onUpdated) onUpdated();
@@ -85,7 +85,7 @@ function PatientList({ onUpdated }) {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`https://my-patient-backend.onrender.com/api/patients/${editingPatient._id}`, formData);
+      await axios.put(`https://lab-c7sj.onrender.com/api/patients/${editingPatient._id}`, formData);
       alert("✅ Patient Updated");
       setEditingPatient(null);
       fetchPatients(selectedDate);

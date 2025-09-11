@@ -6,11 +6,7 @@ import cors from "cors";
 import patientRoutes from "./routes/patient.route.js";
 
 const app = express();
-app.use(cors({
-  origin: ["http://localhost:5173", "https://lab-seven-beta.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(cors());
 
 
 app.use(express.json());
