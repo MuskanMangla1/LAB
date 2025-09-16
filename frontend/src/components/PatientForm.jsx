@@ -11,6 +11,7 @@ function PatientForm({ onAdded }) {
     totalAmount: 0,
     paidAmount: 0,
     paymentMode: "Cash",
+    date: "", // ✅ Added field
   });
   const [testInput, setTestInput] = useState({ testName: "", price: "" });
   const [error, setError] = useState("");
@@ -44,6 +45,7 @@ function PatientForm({ onAdded }) {
         totalAmount: 0,
         paidAmount: 0,
         paymentMode: "Cash",
+        date: "",
       });
       if (onAdded) onAdded();
     } catch (err) {
@@ -148,7 +150,6 @@ function PatientForm({ onAdded }) {
   )}
 </div>
 
-
   <div className="grid md:grid-cols-2 gap-3">
     <div className="flex items-center justify-between p-2 bg-gray-100 rounded-lg">
       <span className="font-medium">Total:</span>
@@ -173,6 +174,14 @@ function PatientForm({ onAdded }) {
     <option>Online</option>
   </select>
 
+  {/* ✅ New Date-Time field */}
+  <input
+    type="datetime-local"
+    className="border rounded-lg p-2 w-full"
+    value={form.date}
+    onChange={(e) => setForm({ ...form, date: e.target.value })}
+  />
+
   {error && <div className="text-red-600">{error}</div>}
 
   <button
@@ -182,7 +191,6 @@ function PatientForm({ onAdded }) {
     Save Patient
   </button>
 </form>
-
   );
 }
 

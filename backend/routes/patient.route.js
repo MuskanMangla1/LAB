@@ -22,12 +22,11 @@ router.post("/", async (req, res) => {
       }));
     }
 
-    // Calculate total from tests if totalAmount not provided
+    // Calculate totals
     const calculatedTotal = testsList.reduce((sum, t) => sum + (t.price || 0), 0);
     const finalTotal = typeof totalAmount === "number" && totalAmount >= 0 ? totalAmount : calculatedTotal;
-
     const finalPaid = typeof paidAmount === "number" && paidAmount >= 0 ? paidAmount : 0;
-    const pendingAmount = Math.max(0, (finalTotal || 0) - finalPaid);
+    const pendingAmount = Math.max(0, finalTotal - finalPaid);
 
     const patient = new Patient({
       name,
@@ -39,7 +38,8 @@ router.post("/", async (req, res) => {
       paidAmount: finalPaid,
       pendingAmount,
       paymentMode: paymentMode || "Cash",
-      date: date ? new Date(date) : undefined
+      // If client provides date, use it, otherwise current datetime
+      date: date ? new Date(date) : new Date()
     });
 
     await patient.save();
@@ -109,7 +109,12 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const updates = { ...req.body };
+
+    // Normalize date if provided
+    if (updates.date) {
+      updates.date = new Date(updates.date);
+    }
 
     const patient = await Patient.findByIdAndUpdate(id, updates, { new: true });
     if (!patient) return res.status(404).json({ error: "Patient not found" });

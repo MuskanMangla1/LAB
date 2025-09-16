@@ -53,7 +53,11 @@ function PatientList({ onUpdated }) {
       if (["age", "totalAmount", "paidAmount"].includes(name)) {
         updated[name] = Number(value);
       }
-      updated.pendingAmount = (updated.totalAmount || 0) - (updated.paidAmount || 0);
+      if (name === "date") {
+        updated.date = value; // ✅ handle datetime-local string
+      }
+      updated.pendingAmount =
+        (updated.totalAmount || 0) - (updated.paidAmount || 0);
       return updated;
     });
   };
@@ -61,7 +65,10 @@ function PatientList({ onUpdated }) {
   // Add test
   const addTest = () => {
     if (!testInput.testName || Number(testInput.price) <= 0) return;
-    const updatedTests = [...(formData.tests || []), { ...testInput, price: Number(testInput.price) }];
+    const updatedTests = [
+      ...(formData.tests || []),
+      { ...testInput, price: Number(testInput.price) },
+    ];
     const total = updatedTests.reduce((s, t) => s + (t.price || 0), 0);
     setFormData({
       ...formData,
@@ -85,7 +92,10 @@ function PatientList({ onUpdated }) {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`https://lab-c7sj.onrender.com/api/patients/${editingPatient._id}`, formData);
+      await axios.put(
+        `https://lab-c7sj.onrender.com/api/patients/${editingPatient._id}`,
+        formData
+      );
       alert("✅ Patient Updated");
       setEditingPatient(null);
       fetchPatients(selectedDate);
@@ -109,7 +119,9 @@ function PatientList({ onUpdated }) {
       </div>
 
       {patients.length === 0 ? (
-        <div className="p-6 text-center text-gray-500">No patients for selected date.</div>
+        <div className="p-6 text-center text-gray-500">
+          No patients for selected date.
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
@@ -134,12 +146,26 @@ function PatientList({ onUpdated }) {
                   <td className="p-2">{p.mobile}</td>
                   <td className="p-2 font-semibold">₹{p.totalAmount}</td>
                   <td className="p-2 text-blue-600">₹{p.paidAmount}</td>
-                  <td className="p-2 text-red-600">₹{p.pendingAmount ?? p.totalAmount - p.paidAmount}</td>
+                  <td className="p-2 text-red-600">
+                    ₹{p.pendingAmount ?? p.totalAmount - p.paidAmount}
+                  </td>
                   <td className="p-2">{p.paymentMode}</td>
-                  <td className="p-2 text-sm text-gray-500">{new Date(p.date).toLocaleTimeString()}</td>
+                  <td className="p-2 text-sm text-gray-500">
+                    {new Date(p.date).toLocaleString()}
+                  </td>
                   <td className="p-2 flex gap-2">
-                    <button onClick={() => handleDelete(p._id)} className="text-red-600 hover:underline">Delete</button>
-                    <button onClick={() => handleEditClick(p)} className="text-blue-600 hover:underline">Edit</button>
+                    <button
+                      onClick={() => handleDelete(p._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => handleEditClick(p)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -148,140 +174,171 @@ function PatientList({ onUpdated }) {
         </div>
       )}
 
-{/* Edit Modal */}
-{editingPatient && (
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-      <h2 className="text-lg font-bold mb-4">✏️ Edit Patient</h2>
+      {/* Edit Modal */}
+      {editingPatient && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold mb-4">✏️ Edit Patient</h2>
 
-      {/* Name, Age, Mobile */}
-      <div className="space-y-2 mb-4">
-        <label className="font-medium">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name || ""}
-          onChange={handleFormChange}
-          className="w-full p-2 border rounded"
-        />
+            {/* Name, Age, Mobile */}
+            <div className="space-y-2 mb-4">
+              <label className="font-medium">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name || ""}
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              />
 
-        <label className="font-medium">Age</label>
-        <input
-          type="number"
-          name="age"
-          value={formData.age || ""}
-          onChange={handleFormChange}
-          className="w-full p-2 border rounded"
-        />
+              <label className="font-medium">Age</label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age || ""}
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              />
 
-        <label className="font-medium">Mobile</label>
-        <input
-          type="text"
-          name="mobile"
-          value={formData.mobile || ""}
-          onChange={handleFormChange}
-          className="w-full p-2 border rounded"
-        />
-      </div>
+              <label className="font-medium">Mobile</label>
+              <input
+                type="text"
+                name="mobile"
+                value={formData.mobile || ""}
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
 
-      {/* Tests Section */}
-      <div className="p-3 border rounded-lg bg-gray-50 mb-4">
-        <h4 className="font-semibold mb-2">🧪 Tests</h4>
+            {/* Tests Section */}
+            <div className="p-3 border rounded-lg bg-gray-50 mb-4">
+              <h4 className="font-semibold mb-2">🧪 Tests</h4>
 
-        {/* Input Row */}
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            value={testInput.testName}
-            onChange={(e) => setTestInput({ ...testInput, testName: e.target.value })}
-            className="border p-2 rounded flex-1"
-          />
-          <input
-            type="number"
-            value={testInput.price}
-            onChange={(e) => setTestInput({ ...testInput, price: e.target.value })}
-            className="border p-2 rounded w-24"
-          />
+              {/* Input Row */}
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={testInput.testName}
+                  onChange={(e) =>
+                    setTestInput({ ...testInput, testName: e.target.value })
+                  }
+                  className="border p-2 rounded flex-1"
+                />
+                <input
+                  type="number"
+                  value={testInput.price}
+                  onChange={(e) =>
+                    setTestInput({ ...testInput, price: e.target.value })
+                  }
+                  className="border p-2 rounded w-24"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addTest}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded w-full"
+              >
+                ➕ Add
+              </button>
+
+              {/* Tests List */}
+              {formData.tests?.length > 0 && (
+                <ul className="space-y-1">
+                  {formData.tests.map((t, i) => (
+                    <li
+                      key={i}
+                      className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                    >
+                      <span>
+                        {t.testName} - ₹{t.price}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeTest(i)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        ❌
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Amounts */}
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span className="font-medium">Total Amount</span>
+                <span className="font-bold text-green-600">
+                  ₹{formData.totalAmount}
+                </span>
+              </div>
+
+              <label className="font-medium">Paid Amount</label>
+              <input
+                type="number"
+                name="paidAmount"
+                value={formData.paidAmount || 0}
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              />
+
+              <div className="flex justify-between items-center bg-gray-100 p-2 rounded">
+                <span className="font-medium">Pending Amount</span>
+                <span className="font-bold text-red-600">
+                  ₹{formData.pendingAmount}
+                </span>
+              </div>
+            </div>
+
+            {/* Payment Mode & Date */}
+            <div className="space-y-2 mb-4">
+              <label className="font-medium">Payment Mode</label>
+              <select
+                name="paymentMode"
+                value={formData.paymentMode || ""}
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">Select Payment Mode</option>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+              </select>
+
+              {/* ✅ Date-Time field */}
+              <label className="font-medium">Date & Time</label>
+              <input
+                type="datetime-local"
+                name="date"
+                value={
+                  formData.date
+                    ? new Date(formData.date).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={handleFormChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleUpdate}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setEditingPatient(null)}
+                className="bg-gray-400 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-          <button
-            type="button"
-            onClick={addTest}
-            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded w-full"
-          >
-            ➕ Add
-          </button>
-
-        {/* Tests List */}
-        {formData.tests?.length > 0 && (
-          <ul className="space-y-1">
-            {formData.tests.map((t, i) => (
-              <li key={i} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                <span>{t.testName} - ₹{t.price}</span>
-                <button
-                  type="button"
-                  onClick={() => removeTest(i)}
-                  className="text-red-500 hover:text-red-700 text-sm"
-                >
-                  ❌
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Amounts */}
-      <div className="space-y-2 mb-4">
-        <div className="flex justify-between items-center bg-gray-100 p-2 rounded">
-          <span className="font-medium">Total Amount</span>
-          <span className="font-bold text-green-600">₹{formData.totalAmount}</span>
-        </div>
-
-        <label className="font-medium">Paid Amount</label>
-        <input
-          type="number"
-          name="paidAmount"
-          value={formData.paidAmount || 0}
-          onChange={handleFormChange}
-          className="w-full p-2 border rounded"
-        />
-
-        <div className="flex justify-between items-center bg-gray-100 p-2 rounded">
-          <span className="font-medium">Pending Amount</span>
-          <span className="font-bold text-red-600">₹{formData.pendingAmount}</span>
-        </div>
-      </div>
-
-      {/* Payment Mode & Date */}
-      <div className="space-y-2 mb-4">
-        <label className="font-medium">Payment Mode</label>
-        <select
-          name="paymentMode"
-          value={formData.paymentMode || ""}
-          onChange={handleFormChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select Payment Mode</option>
-          <option value="Cash">Cash</option>
-          <option value="UPI">UPI</option>
-          <option value="Card">Card</option>
-        </select>
-
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-2 mt-4">
-        <button onClick={handleUpdate} className="bg-blue-600 text-white px-4 py-2 rounded">
-          Save
-        </button>
-        <button onClick={() => setEditingPatient(null)} className="bg-gray-400 text-white px-4 py-2 rounded">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+      )}
     </div>
   );
 }
